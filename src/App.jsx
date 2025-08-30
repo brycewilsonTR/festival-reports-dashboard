@@ -83,6 +83,10 @@ function App() {
   const handleLoginSuccess = (user) => {
     setIsAuthenticated(true);
     setIsAdmin(user.isAdmin);
+    // Set username in localStorage for API calls
+    localStorage.setItem('username', user.email);
+    // Update userDataService username
+    userDataService.setUsername(user.email);
   };
 
   // Show login page if not authenticated

@@ -271,8 +271,7 @@ const authenticateUser = async (req, res, next) => {
   try {
     let user = await getUserByEmail(username);
     if (!user) {
-      const userId = await createUser(username, 'default', false);
-      user = { id: userId, email: username, is_admin: false };
+      return res.status(401).json({ error: 'User not found' });
     }
     req.user = user;
     next();
@@ -462,6 +461,10 @@ app.post('/api/user/bookmarks', authenticateUser, async (req, res) => {
     }
     
     const success = await addBookmark(req.user.id, eventId);
+    if (success) {
+      // Emit global update for real-time synchronization
+      emitGlobalUpdate('bookmark-added', { eventId, userId: req.user.id });
+    }
     res.json({ success, message: success ? 'Bookmark added' : 'Already bookmarked' });
   } catch (error) {
     console.error('Error adding bookmark:', error);
@@ -473,6 +476,10 @@ app.delete('/api/user/bookmarks/:eventId', authenticateUser, async (req, res) =>
   try {
     const { eventId } = req.params;
     const success = await removeBookmark(req.user.id, eventId);
+    if (success) {
+      // Emit global update for real-time synchronization
+      emitGlobalUpdate('bookmark-removed', { eventId, userId: req.user.id });
+    }
     res.json({ success, message: success ? 'Bookmark removed' : 'Bookmark not found' });
   } catch (error) {
     console.error('Error removing bookmark:', error);
@@ -501,6 +508,8 @@ app.post('/api/user/marketplace-links/:eventId', authenticateUser, async (req, r
     }
     
     await setCustomMarketplaceLink(req.user.id, eventId, marketplaceType, link);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('marketplace-link-updated', { eventId, userId: req.user.id, marketplaceType, link });
     res.json({ success: true, message: 'Marketplace link saved' });
   } catch (error) {
     console.error('Error saving marketplace link:', error);
@@ -529,6 +538,8 @@ app.post('/api/user/listing-links/:listingId', authenticateUser, async (req, res
     }
     
     await setCustomListingLink(req.user.id, listingId, marketplaceType, link);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('listing-link-updated', { listingId, userId: req.user.id, marketplaceType, link });
     res.json({ success: true, message: 'Listing link saved' });
   } catch (error) {
     console.error('Error saving listing link:', error);
@@ -555,6 +566,8 @@ app.post('/api/user/manual-categories', authenticateUser, async (req, res) => {
     }
     
     await setManualCategory(req.user.id, section, category);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('manual-category-updated', { section, category, userId: req.user.id });
     res.json({ success: true, message: 'Manual category saved' });
   } catch (error) {
     console.error('Error saving manual category:', error);
@@ -566,6 +579,8 @@ app.delete('/api/user/manual-categories/:section', authenticateUser, async (req,
   try {
     const { section } = req.params;
     await deleteManualCategory(req.user.id, section);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('manual-category-deleted', { section, userId: req.user.id });
     res.json({ success: true, message: 'Manual category deleted' });
   } catch (error) {
     console.error('Error deleting manual category:', error);
@@ -593,6 +608,8 @@ app.post('/api/user/autopriced-listings/:listingId', authenticateUser, async (re
     }
     
     await setAutopricedListing(req.user.id, listingId, isAutopriced);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('autopriced-listing-updated', { listingId, isAutopriced, userId: req.user.id });
     res.json({ success: true, message: 'Autopriced status saved' });
   } catch (error) {
     console.error('Error saving autopriced status:', error);
@@ -621,6 +638,8 @@ app.post('/api/user/listing-tags/:listingId', authenticateUser, async (req, res)
     }
     
     await addListingTag(req.user.id, listingId, tag.trim());
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('listing-tag-added', { listingId, tag: tag.trim(), userId: req.user.id });
     res.json({ success: true, message: 'Tag added' });
   } catch (error) {
     console.error('Error adding listing tag:', error);
@@ -633,6 +652,8 @@ app.delete('/api/user/listing-tags/:listingId/:tag', authenticateUser, async (re
     const { listingId, tag } = req.params;
     
     await removeListingTag(req.user.id, listingId, decodeURIComponent(tag));
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('listing-tag-removed', { listingId, tag: decodeURIComponent(tag), userId: req.user.id });
     res.json({ success: true, message: 'Tag removed' });
   } catch (error) {
     console.error('Error removing listing tag:', error);
@@ -714,6 +735,8 @@ app.post('/api/user/verification-mapped-listings/:listingId', authenticateUser, 
   try {
     const { listingId } = req.params;
     await addVerificationMappedListing(req.user.id, listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('verification-mapped-added', { listingId, userId: req.user.id });
     res.json({ success: true, message: 'Listing marked as mapped' });
   } catch (error) {
     console.error('Error adding verification mapped listing:', error);
@@ -725,6 +748,8 @@ app.delete('/api/user/verification-mapped-listings/:listingId', authenticateUser
   try {
     const { listingId } = req.params;
     await removeVerificationMappedListing(req.user.id, listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('verification-mapped-removed', { listingId, userId: req.user.id });
     res.json({ success: true, message: 'Listing unmarked as mapped' });
   } catch (error) {
     console.error('Error removing verification mapped listing:', error);
@@ -747,6 +772,8 @@ app.post('/api/user/verification-strategy-listings/:listingId', authenticateUser
   try {
     const { listingId } = req.params;
     await addVerificationStrategyListing(req.user.id, listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('verification-strategy-added', { listingId, userId: req.user.id });
     res.json({ success: true, message: 'Listing marked for strategy' });
   } catch (error) {
     console.error('Error adding verification strategy listing:', error);
@@ -758,6 +785,8 @@ app.delete('/api/user/verification-strategy-listings/:listingId', authenticateUs
   try {
     const { listingId } = req.params;
     await removeVerificationStrategyListing(req.user.id, listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('verification-strategy-removed', { listingId, userId: req.user.id });
     res.json({ success: true, message: 'Listing unmarked for strategy' });
   } catch (error) {
     console.error('Error removing verification strategy listing:', error);
@@ -814,6 +843,8 @@ app.post('/api/user/three-day-mapped-listings/:listingId', authenticateUser, asy
   try {
     const { listingId } = req.params;
     await addThreeDayMappedListing(req.user.id, listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('three-day-mapped-added', { listingId, userId: req.user.id });
     res.json({ success: true, message: 'Listing marked as mapped' });
   } catch (error) {
     console.error('Error adding three day mapped listing:', error);
@@ -825,6 +856,8 @@ app.delete('/api/user/three-day-mapped-listings/:listingId', authenticateUser, a
   try {
     const { listingId } = req.params;
     await removeThreeDayMappedListing(req.user.id, listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('three-day-mapped-removed', { listingId, userId: req.user.id });
     res.json({ success: true, message: 'Listing unmarked as mapped' });
   } catch (error) {
     console.error('Error removing three day mapped listing:', error);
@@ -847,6 +880,8 @@ app.post('/api/user/three-day-strategy-listings/:listingId', authenticateUser, a
   try {
     const { listingId } = req.params;
     await addThreeDayStrategyListing(req.user.id, listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('three-day-strategy-added', { listingId, userId: req.user.id });
     res.json({ success: true, message: 'Listing marked for strategy' });
   } catch (error) {
     console.error('Error adding three day strategy listing:', error);
@@ -858,7 +893,9 @@ app.delete('/api/user/three-day-strategy-listings/:listingId', authenticateUser,
   try {
     const { listingId } = req.params;
     await removeThreeDayStrategyListing(req.user.id, listingId);
-    res.json({ success: true, message: 'Listing unmarked for strategy' });
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('three-day-strategy-removed', { listingId, userId: req.user.id });
+    res.json({ success: true, message: 'Listing unmarked as mapped' });
   } catch (error) {
     console.error('Error removing three day strategy listing:', error);
     res.status(500).json({ error: 'Failed to unmark listing for strategy' });
@@ -880,6 +917,8 @@ app.post('/api/global/verification-mapped-listings/:listingId', async (req, res)
   try {
     const { listingId } = req.params;
     await addGlobalVerificationMappedListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-verification-mapped-added', { listingId });
     res.json({ success: true, message: 'Listing marked as mapped globally' });
   } catch (error) {
     console.error('Error adding global verification mapped listing:', error);
@@ -891,6 +930,8 @@ app.delete('/api/global/verification-mapped-listings/:listingId', async (req, re
   try {
     const { listingId } = req.params;
     await removeGlobalVerificationMappedListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-verification-mapped-removed', { listingId });
     res.json({ success: true, message: 'Listing unmarked as mapped globally' });
   } catch (error) {
     console.error('Error removing global verification mapped listing:', error);
@@ -912,6 +953,8 @@ app.post('/api/global/verification-strategy-listings/:listingId', async (req, re
   try {
     const { listingId } = req.params;
     await addGlobalVerificationStrategyListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-verification-strategy-added', { listingId });
     res.json({ success: true, message: 'Listing marked for strategy globally' });
   } catch (error) {
     console.error('Error adding global verification strategy listing:', error);
@@ -923,6 +966,8 @@ app.delete('/api/global/verification-strategy-listings/:listingId', async (req, 
   try {
     const { listingId } = req.params;
     await removeGlobalVerificationStrategyListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-verification-strategy-removed', { listingId });
     res.json({ success: true, message: 'Listing unmarked for strategy globally' });
   } catch (error) {
     console.error('Error removing global verification strategy listing:', error);
@@ -945,6 +990,8 @@ app.post('/api/global/verification-strategy-dates/:listingId', async (req, res) 
     const { listingId } = req.params;
     const { strategyDate } = req.body;
     await setGlobalVerificationStrategyDate(listingId, strategyDate);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-verification-strategy-date-updated', { listingId, strategyDate });
     res.json({ success: true, message: 'Strategy date saved globally' });
   } catch (error) {
     console.error('Error saving global verification strategy date:', error);
@@ -956,6 +1003,8 @@ app.delete('/api/global/verification-strategy-dates/:listingId', async (req, res
   try {
     const { listingId } = req.params;
     await removeGlobalVerificationStrategyDate(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-verification-strategy-date-removed', { listingId });
     res.json({ success: true, message: 'Strategy date removed globally' });
   } catch (error) {
     console.error('Error removing global verification strategy date:', error);
@@ -977,6 +1026,8 @@ app.post('/api/global/three-day-mapped-listings/:listingId', async (req, res) =>
   try {
     const { listingId } = req.params;
     await addGlobalThreeDayMappedListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-three-day-mapped-added', { listingId });
     res.json({ success: true, message: 'Listing marked as mapped globally' });
   } catch (error) {
     console.error('Error adding global three day mapped listing:', error);
@@ -988,6 +1039,8 @@ app.delete('/api/global/three-day-mapped-listings/:listingId', async (req, res) 
   try {
     const { listingId } = req.params;
     await removeGlobalThreeDayMappedListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-three-day-mapped-removed', { listingId });
     res.json({ success: true, message: 'Listing unmarked as mapped globally' });
   } catch (error) {
     console.error('Error removing global three day mapped listing:', error);
@@ -1009,6 +1062,8 @@ app.post('/api/global/three-day-strategy-listings/:listingId', async (req, res) 
   try {
     const { listingId } = req.params;
     await addGlobalThreeDayStrategyListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-three-day-strategy-added', { listingId });
     res.json({ success: true, message: 'Listing marked for strategy globally' });
   } catch (error) {
     console.error('Error adding global three day strategy listing:', error);
@@ -1020,6 +1075,8 @@ app.delete('/api/global/three-day-strategy-listings/:listingId', async (req, res
   try {
     const { listingId } = req.params;
     await removeGlobalThreeDayStrategyListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('global-three-day-strategy-removed', { listingId });
     res.json({ success: true, message: 'Listing unmarked for strategy globally' });
   } catch (error) {
     console.error('Error removing global three day strategy listing:', error);
@@ -1042,6 +1099,8 @@ app.post('/api/global/starred-festival-mapped-listings/:listingId', async (req, 
   try {
     const { listingId } = req.params;
     await addStarredFestivalMappedListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('starred-festival-mapped-added', { listingId });
     res.json({ success: true, message: 'Starred festival marked as mapped globally' });
   } catch (error) {
     console.error('Error adding starred festival mapped listing:', error);
@@ -1053,6 +1112,8 @@ app.delete('/api/global/starred-festival-mapped-listings/:listingId', async (req
   try {
     const { listingId } = req.params;
     await removeStarredFestivalMappedListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('starred-festival-mapped-removed', { listingId });
     res.json({ success: true, message: 'Starred festival unmarked as mapped globally' });
   } catch (error) {
     console.error('Error removing starred festival mapped listing:', error);
@@ -1074,6 +1135,8 @@ app.post('/api/global/starred-festival-strategy-listings/:listingId', async (req
   try {
     const { listingId } = req.params;
     await addStarredFestivalStrategyListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('starred-festival-strategy-added', { listingId });
     res.json({ success: true, message: 'Starred festival marked for strategy globally' });
   } catch (error) {
     console.error('Error adding starred festival strategy listing:', error);
@@ -1085,6 +1148,8 @@ app.delete('/api/global/starred-festival-strategy-listings/:listingId', async (r
   try {
     const { listingId } = req.params;
     await removeStarredFestivalStrategyListing(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('starred-festival-strategy-removed', { listingId });
     res.json({ success: true, message: 'Starred festival unmarked for strategy globally' });
   } catch (error) {
     console.error('Error removing starred festival strategy listing:', error);
@@ -1107,6 +1172,8 @@ app.post('/api/global/starred-festival-strategy-dates/:listingId', async (req, r
     const { listingId } = req.params;
     const { strategyDate } = req.body;
     await setStarredFestivalStrategyDate(listingId, strategyDate);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('starred-festival-strategy-date-updated', { listingId, strategyDate });
     res.json({ success: true, message: 'Starred festival strategy date set globally' });
   } catch (error) {
     console.error('Error saving starred festival strategy date:', error);
@@ -1118,6 +1185,8 @@ app.delete('/api/global/starred-festival-strategy-dates/:listingId', async (req,
   try {
     const { listingId } = req.params;
     await removeStarredFestivalStrategyDate(listingId);
+    // Emit global update for real-time synchronization
+    emitGlobalUpdate('starred-festival-strategy-date-removed', { listingId });
     res.json({ success: true, message: 'Starred festival strategy date removed globally' });
   } catch (error) {
     console.error('Error removing starred festival strategy date:', error);
