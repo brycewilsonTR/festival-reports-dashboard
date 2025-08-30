@@ -289,7 +289,9 @@ export async function updateUserPassword(userId, passwordHash) {
 
 // Bookmark functions
 export async function getBookmarks(userId) {
-  return await Bookmark.find({ user_id: userId });
+  const bookmarks = await Bookmark.find({ user_id: userId });
+  // Return only the event IDs for compatibility with frontend
+  return bookmarks.map(bookmark => bookmark.event_id);
 }
 
 export async function addBookmark(userId, eventId) {
@@ -310,7 +312,13 @@ export async function removeBookmark(userId, eventId) {
 
 // Custom marketplace links functions
 export async function getCustomMarketplaceLinks(userId, eventId) {
-  return await CustomMarketplaceLink.find({ user_id: userId, event_id: eventId });
+  const links = await CustomMarketplaceLink.find({ user_id: userId, event_id: eventId });
+  // Return as object for frontend compatibility: { marketplace_type: link }
+  const linksObject = {};
+  links.forEach(link => {
+    linksObject[link.marketplace_type.toLowerCase()] = link.link;
+  });
+  return linksObject;
 }
 
 export async function setCustomMarketplaceLink(userId, eventId, marketplaceType, link) {
@@ -336,7 +344,13 @@ export async function setCustomListingLink(userId, listingId, marketplaceType, l
 
 // Manual categories functions
 export async function getManualCategories(userId) {
-  return await ManualCategory.find({ user_id: userId });
+  const categories = await ManualCategory.find({ user_id: userId });
+  // Return as object for frontend compatibility: { section: category }
+  const categoryObject = {};
+  categories.forEach(cat => {
+    categoryObject[cat.section] = cat.category;
+  });
+  return categoryObject;
 }
 
 export async function setManualCategory(userId, section, category) {
@@ -353,7 +367,13 @@ export async function deleteManualCategory(userId, section) {
 
 // Autopriced listings functions
 export async function getAutopricedListings(userId) {
-  return await AutopricedListing.find({ user_id: userId });
+  const listings = await AutopricedListing.find({ user_id: userId });
+  // Return as object for frontend compatibility: { listing_id: is_autopriced }
+  const listingsObject = {};
+  listings.forEach(listing => {
+    listingsObject[listing.listing_id] = listing.is_autopriced;
+  });
+  return listingsObject;
 }
 
 export async function setAutopricedListing(userId, listingId, isAutopriced) {
@@ -366,7 +386,16 @@ export async function setAutopricedListing(userId, listingId, isAutopriced) {
 
 // Listing tags functions
 export async function getListingTags(userId) {
-  return await ListingTag.find({ user_id: userId });
+  const tags = await ListingTag.find({ user_id: userId });
+  // Return as object for frontend compatibility: { listing_id: [tags] }
+  const tagsObject = {};
+  tags.forEach(tag => {
+    if (!tagsObject[tag.listing_id]) {
+      tagsObject[tag.listing_id] = [];
+    }
+    tagsObject[tag.listing_id].push(tag.tag);
+  });
+  return tagsObject;
 }
 
 export async function addListingTag(userId, listingId, tag) {
@@ -403,7 +432,13 @@ export async function addBulkListingTags(userId, listingIds, tag) {
 
 // Unverification dates functions
 export async function getUnverificationDates(userId) {
-  return await UnverificationDate.find({ user_id: userId });
+  const dates = await UnverificationDate.find({ user_id: userId });
+  // Return as object for frontend compatibility: { listing_id: unverification_date }
+  const datesObject = {};
+  dates.forEach(date => {
+    datesObject[date.listing_id] = date.unverification_date;
+  });
+  return datesObject;
 }
 
 export async function setUnverificationDate(userId, listingId, unverificationDate) {
@@ -421,7 +456,9 @@ export async function removeUnverificationDate(userId, listingId) {
 
 // Verification mapped listings functions
 export async function getVerificationMappedListings(userId) {
-  return await VerificationMappedListing.find({ user_id: userId });
+  const listings = await VerificationMappedListing.find({ user_id: userId });
+  // Return only the listing IDs for frontend compatibility
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addVerificationMappedListing(userId, listingId) {
@@ -442,7 +479,9 @@ export async function removeVerificationMappedListing(userId, listingId) {
 
 // Verification strategy listings functions
 export async function getVerificationStrategyListings(userId) {
-  return await VerificationStrategyListing.find({ user_id: userId });
+  const listings = await VerificationStrategyListing.find({ user_id: userId });
+  // Return only the listing IDs for frontend compatibility
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addVerificationStrategyListing(userId, listingId) {
@@ -463,7 +502,13 @@ export async function removeVerificationStrategyListing(userId, listingId) {
 
 // Verification strategy dates functions
 export async function getVerificationStrategyDates(userId) {
-  return await VerificationStrategyDate.find({ user_id: userId });
+  const dates = await VerificationStrategyDate.find({ user_id: userId });
+  // Return as object for frontend compatibility: { listing_id: strategy_date }
+  const datesObject = {};
+  dates.forEach(date => {
+    datesObject[date.listing_id] = date.strategy_date;
+  });
+  return datesObject;
 }
 
 export async function setVerificationStrategyDate(userId, listingId, strategyDate) {
@@ -481,7 +526,9 @@ export async function removeVerificationStrategyDate(userId, listingId) {
 
 // Three day mapped listings functions
 export async function getThreeDayMappedListings(userId) {
-  return await ThreeDayMappedListing.find({ user_id: userId });
+  const listings = await ThreeDayMappedListing.find({ user_id: userId });
+  // Return only the listing IDs for frontend compatibility
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addThreeDayMappedListing(userId, listingId) {
@@ -502,7 +549,9 @@ export async function removeThreeDayMappedListing(userId, listingId) {
 
 // Three day strategy listings functions
 export async function getThreeDayStrategyListings(userId) {
-  return await ThreeDayStrategyListing.find({ user_id: userId });
+  const listings = await ThreeDayStrategyListing.find({ user_id: userId });
+  // Return only the listing IDs for frontend compatibility
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addThreeDayStrategyListing(userId, listingId) {
