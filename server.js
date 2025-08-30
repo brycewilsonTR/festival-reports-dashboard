@@ -1500,7 +1500,23 @@ app.get('/api/v1/batch/event-data', async (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Proxy server is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'Proxy server is running', 
+    timestamp: new Date().toISOString(),
+    mongodb: isConnected ? 'connected' : 'disconnected',
+    uptime: process.uptime()
+  });
+});
+
+// Root endpoint for Railway health checks
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Festival Reports API Server',
+    health: '/health',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Socket.io connection handling
