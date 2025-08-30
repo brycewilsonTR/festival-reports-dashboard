@@ -1,7 +1,7 @@
 // User management service for admin operations
 class UserManagementService {
   constructor() {
-    this.baseUrl = 'http://localhost:3001/api/admin/users';
+    this.baseUrl = 'https://web-production-b1147.up.railway.app/api/admin/users';
   }
 
   // Get auth token from auth service

@@ -1,7 +1,7 @@
 // Authentication service for user login and management
 class AuthService {
   constructor() {
-    this.baseUrl = 'http://localhost:3001/api/auth';
+    this.baseUrl = 'https://web-production-b1147.up.railway.app/api/auth';
     this.currentUser = null;
     this.isAuthenticated = false;
     this.isAdmin = false;

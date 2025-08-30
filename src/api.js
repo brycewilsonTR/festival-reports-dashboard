@@ -3,11 +3,7 @@ import axios from 'axios';
 // API base URL - hardcoded to Railway for now to fix the issue
 const API_BASE_URL = 'https://web-production-b1147.up.railway.app/api';
 
-// Debug logging to see what's happening
-console.log('🔍 Environment Variables Debug:');
-console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
-console.log('API_BASE_URL:', API_BASE_URL);
-console.log('All env vars:', import.meta.env);
+
 
 // Retry configuration
 const MAX_RETRIES = 3;

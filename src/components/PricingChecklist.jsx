@@ -165,7 +165,7 @@ const PricingChecklist = () => {
           console.log('📅 Fetching verification listings from 2025-08-25 onwards');
           
           // Use the backend endpoint that has the API key configured
-          const response = await fetch(`http://localhost:3001/api/zerohero/listings?onlyAvailable=1&eventDateFrom=2025-08-25`, {
+          const response = await fetch(`https://web-production-b1147.up.railway.app/api/zerohero/listings?onlyAvailable=1&eventDateFrom=2025-08-25`, {
             method: 'GET',
             headers: {
               'accept': 'application/json'
