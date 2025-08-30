@@ -2,7 +2,7 @@ import { apiService } from '../api.js';
 
 class VerificationService {
   constructor() {
-    this.baseUrl = '/global'; // Fixed to match server endpoints
+    this.baseUrl = '/api/global'; // Fixed to match server endpoints
   }
 
   // Helper method to make API calls (no authentication needed for global endpoints)
