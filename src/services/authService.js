@@ -1,7 +1,8 @@
 // Authentication service for user login and management
 class AuthService {
   constructor() {
-    this.baseUrl = 'https://web-production-b1147.up.railway.app/api/auth';
+    // Use centralized API configuration
+    this.baseUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/auth` : 'http://localhost:3001/api/auth';
     this.currentUser = null;
     this.isAuthenticated = false;
     this.isAdmin = false;

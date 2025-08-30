@@ -3,7 +3,8 @@ class UserDataService {
   constructor() {
     this.username = localStorage.getItem('username') || 'default';
     this.useBackend = true; // Set to false to use localStorage only
-    this.baseUrl = 'https://web-production-b1147.up.railway.app/api/user';
+    // Use centralized API configuration
+    this.baseUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/user` : 'http://localhost:3001/api/user';
   }
 
   // Set username for API calls

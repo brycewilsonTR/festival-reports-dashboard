@@ -1,7 +1,8 @@
 // User management service for admin operations
 class UserManagementService {
   constructor() {
-    this.baseUrl = 'https://web-production-b1147.up.railway.app/api/admin/users';
+    // Use centralized API configuration
+    this.baseUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/admin/users` : 'http://localhost:3001/api/admin/users';
   }
 
   // Get auth token from auth service

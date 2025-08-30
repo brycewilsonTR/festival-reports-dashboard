@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// API base URL - hardcoded to Railway for now to fix the issue
-const API_BASE_URL = 'https://web-production-b1147.up.railway.app/api';
+// API base URL - uses environment variable for production, localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:3001/api';
 
 
 
