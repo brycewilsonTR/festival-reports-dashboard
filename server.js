@@ -1500,13 +1500,20 @@ app.get('/api/v1/batch/event-data', async (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Proxy server is running', 
-    timestamp: new Date().toISOString(),
-    mongodb: isConnected ? 'connected' : 'disconnected',
-    uptime: process.uptime()
-  });
+  try {
+    res.json({ 
+      status: 'OK', 
+      message: 'Proxy server is running', 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'ERROR', 
+      message: 'Health check failed',
+      error: error.message 
+    });
+  }
 });
 
 // Root endpoint for Railway health checks
