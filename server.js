@@ -98,7 +98,16 @@ await initDatabase();
 
 // Enable CORS with restrictions
 app.use(cors({
-  origin: config.security.corsOrigin,
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001', 
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'http://localhost:3004',
+    'http://localhost:3010',
+    'https://festival-reports-dashboard.vercel.app',
+    'https://festival-reports-dashboard-6bjzrdpdb-bryce-wilsons-projects.vercel.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'x-username', 'Authorization']
