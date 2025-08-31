@@ -1702,7 +1702,7 @@ const PricingChecklist = () => {
           ) : verificationListings.length > 0 ? (
             <div className="space-y-2">
               {verificationListings
-                .sort((a, b) => new Date(a.eventDate) - new Date(a.eventDate))
+                .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate))
                 .filter(listing => verificationShowAll || !(verificationMappedListings.has(listing.id) && verificationStrategyListings.has(listing.id)))
                 .map(listing => (
                   <div key={listing.id} className={`flex items-center justify-between p-2 rounded border transition-colors ${
