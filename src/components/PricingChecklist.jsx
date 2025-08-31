@@ -162,10 +162,14 @@ const PricingChecklist = () => {
           const today = now.toISOString().split('T')[0];
           const threeDaysLater = threeDaysFromNow.toISOString().split('T')[0];
           
-          console.log('📅 Fetching verification listings from 2025-08-25 onwards');
+          // Calculate 4 days from now for the 4+ Days Away section
+          const fourDaysFromNow = new Date(now.getTime() + (4 * 24 * 60 * 60 * 1000));
+          const fourDaysLater = fourDaysFromNow.toISOString().split('T')[0];
+          
+          console.log('📅 Fetching verification listings from 4+ days away (', fourDaysLater, 'onwards)');
           
           // Use the backend endpoint that has the API key configured
-                      const response = await fetch(`${import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : 'http://localhost:3001'}/api/zerohero/listings?onlyAvailable=1&eventDateFrom=2025-08-25`, {
+                      const response = await fetch(`${import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : 'http://localhost:3001'}/api/zerohero/listings?onlyAvailable=1&eventDateFrom=${fourDaysLater}`, {
             method: 'GET',
             headers: {
               'accept': 'application/json'
@@ -175,7 +179,7 @@ const PricingChecklist = () => {
           if (response.ok) {
             const data = await response.json();
             if (data && data.resultData) {
-              // Filter listings to only include those with any valid price > $0
+              // Filter listings to only include those with any valid price > $0 AND future event dates
               const filteredListings = data.resultData.filter(listing => {
                 const price = parseFloat(listing.price || 0);
                 const costPrice = parseFloat(listing.costPrice || 0);
@@ -183,6 +187,20 @@ const PricingChecklist = () => {
                 
                 // Include if any price field is greater than 0
                 const hasValidPrice = price > 0 || costPrice > 0 || retailPrice > 0;
+                
+                // Check if event date is in the future (4+ days away)
+                let isFutureEvent = false;
+                if (listing.eventDate) {
+                  const eventDate = new Date(listing.eventDate);
+                  const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+                  isFutureEvent = daysUntilEvent >= 4;
+                  
+                  if (!isFutureEvent) {
+                    console.log(`⚠️ Filtering out listing ${listing.id} (${listing.eventName}) - event date ${listing.eventDate} is only ${daysUntilEvent} days away`);
+                  }
+                } else {
+                  console.log(`⚠️ Filtering out listing ${listing.id} (${listing.eventName}) - no event date found`);
+                }
                 
                 if (!hasValidPrice) {
                   console.log(`⚠️ Filtering out listing ${listing.id} (${listing.eventName}) - no valid price found:`, {
@@ -192,7 +210,7 @@ const PricingChecklist = () => {
                   });
                 }
                 
-                return hasValidPrice;
+                return hasValidPrice && isFutureEvent;
               });
               
                       console.log(`✅ Loaded ${filteredListings.length} verification listings from backend`);
@@ -1677,7 +1695,7 @@ const PricingChecklist = () => {
         <div className="ml-8 p-4 bg-orange-50 rounded-lg border border-orange-200">
           <h4 className="text-sm font-semibold text-orange-900 mb-3 flex items-center gap-2">
             <MapPin className="w-4 h-4" />
-            Events 4+ Days Away (showing event dates)
+            Events 4+ Days Away
             {verificationLoading ? (
               <span className="text-orange-600 text-xs">(Loading...)</span>
             ) : (
