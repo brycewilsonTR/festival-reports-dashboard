@@ -572,7 +572,8 @@ export async function removeThreeDayStrategyListing(userId, listingId) {
 
 // Global verification mapped listings functions (shared across users)
 export async function getGlobalVerificationMappedListings() {
-  return await GlobalVerificationMappedListing.find({});
+  const listings = await GlobalVerificationMappedListing.find({}, 'listing_id');
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addGlobalVerificationMappedListing(listingId) {
@@ -593,7 +594,8 @@ export async function removeGlobalVerificationMappedListing(listingId) {
 
 // Global verification strategy listings functions (shared across users)
 export async function getGlobalVerificationStrategyListings() {
-  return await GlobalVerificationStrategyListing.find({});
+  const listings = await GlobalVerificationStrategyListing.find({}, 'listing_id');
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addGlobalVerificationStrategyListing(listingId) {
@@ -614,7 +616,12 @@ export async function removeGlobalVerificationStrategyListing(listingId) {
 
 // Global verification strategy dates functions (shared across users)
 export async function getGlobalVerificationStrategyDates() {
-  return await GlobalVerificationStrategyDate.find({});
+  const dates = await GlobalVerificationStrategyDate.find({}, 'listing_id strategy_date');
+  const result = {};
+  dates.forEach(date => {
+    result[date.listing_id] = date.strategy_date;
+  });
+  return result;
 }
 
 export async function setGlobalVerificationStrategyDate(listingId, strategyDate) {
@@ -632,7 +639,8 @@ export async function removeGlobalVerificationStrategyDate(listingId) {
 
 // Global three day mapped listings functions (shared across users)
 export async function getGlobalThreeDayMappedListings() {
-  return await GlobalThreeDayMappedListing.find({});
+  const listings = await GlobalThreeDayMappedListing.find({}, 'listing_id');
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addGlobalThreeDayMappedListing(listingId) {
@@ -653,7 +661,8 @@ export async function removeGlobalThreeDayMappedListing(listingId) {
 
 // Global three day strategy listings functions (shared across users)
 export async function getGlobalThreeDayStrategyListings() {
-  return await GlobalThreeDayStrategyListing.find({});
+  const listings = await GlobalThreeDayStrategyListing.find({}, 'listing_id');
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addGlobalThreeDayStrategyListing(listingId) {
@@ -674,7 +683,8 @@ export async function removeGlobalThreeDayStrategyListing(listingId) {
 
 // Starred festival mapped listings functions (shared across users)
 export async function getStarredFestivalMappedListings() {
-  return await StarredFestivalMappedListing.find({});
+  const listings = await StarredFestivalMappedListing.find({}, 'listing_id');
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addStarredFestivalMappedListing(listingId) {
@@ -695,7 +705,8 @@ export async function removeStarredFestivalMappedListing(listingId) {
 
 // Starred festival strategy listings functions (shared across users)
 export async function getStarredFestivalStrategyListings() {
-  return await StarredFestivalStrategyListing.find({});
+  const listings = await StarredFestivalStrategyListing.find({}, 'listing_id');
+  return listings.map(listing => listing.listing_id);
 }
 
 export async function addStarredFestivalStrategyListing(listingId) {
@@ -716,7 +727,12 @@ export async function removeStarredFestivalStrategyListing(listingId) {
 
 // Starred festival strategy dates functions (shared across users)
 export async function getStarredFestivalStrategyDates() {
-  return await StarredFestivalStrategyDate.find({});
+  const dates = await StarredFestivalStrategyDate.find({}, 'listing_id strategy_date');
+  const result = {};
+  dates.forEach(date => {
+    result[date.listing_id] = date.strategy_date;
+  });
+  return result;
 }
 
 export async function setStarredFestivalStrategyDate(listingId, strategyDate) {
