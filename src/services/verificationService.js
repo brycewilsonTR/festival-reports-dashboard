@@ -279,4 +279,4 @@ class VerificationService {
   }
 }
 
-export const verificationService = new VerificationService(); 
+export const verificationService = new VerificationService(); // Trigger redeploy
