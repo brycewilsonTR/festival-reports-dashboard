@@ -1649,4 +1649,4 @@ server.listen(PORT, () => {
   console.log(`🔑 API key configured:`, config.zeroHero.apiKey ? `***${config.zeroHero.apiKey.slice(-4)}` : `NOT_SET`);
   console.log(`💾 User data storage enabled`);
   console.log(`🔌 Socket.io real-time updates enabled`);
-}); 
+}); // Force redeploy - Mon Sep  1 14:32:48 EDT 2025
