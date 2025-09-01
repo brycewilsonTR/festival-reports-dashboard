@@ -746,3 +746,4 @@ export async function setStarredFestivalStrategyDate(listingId, strategyDate) {
 export async function removeStarredFestivalStrategyDate(listingId) {
   const result = await StarredFestivalStrategyDate.deleteOne({ listing_id: listingId });
   return result.deletedCount > 0;
+}
