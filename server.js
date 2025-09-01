@@ -323,7 +323,7 @@ app.post('/api/auth/login', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        isAdmin: user.is_admin === 1,
+        isAdmin: Boolean(user.is_admin),
         createdAt: user.created_at,
         lastLogin: user.last_login
       }
