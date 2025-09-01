@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { config } from './config.js';
+import rateLimit from 'express-rate-limit';
 import {
   initDatabase,
   createUser,
@@ -93,14 +94,14 @@ if (!config.zeroHero.apiKey) {
   process.exit(1);
 }
 
-// Initialize database
-try {
-  await initDatabase();
+// Initialize database (non-blocking)
+console.log('🔄 Initializing database...');
+initDatabase().then(() => {
   console.log('✅ Database initialized successfully');
-} catch (error) {
+}).catch((error) => {
   console.error('⚠️  Database initialization failed:', error.message);
   console.log('🔄 Server will continue without database (some features may not work)');
-}
+});
 
 // Enable CORS with restrictions
 app.use(cors({
@@ -121,7 +122,6 @@ app.use(cors({
 app.use(express.json());
 
 // Rate limiting configuration
-import rateLimit from 'express-rate-limit';
 
 // Spike arrest: 1,000 calls per second
 const spikeArrestLimiter = rateLimit({
@@ -1600,23 +1600,15 @@ app.get('/health', (req, res) => {
   }
 });
 
-// Root endpoint for Railway health checks
+// Root endpoint for Railway health checks (immediate response)
 app.get('/', (req, res) => {
-  try {
-    res.json({ 
-      status: 'OK', 
-      message: 'Festival Reports API Server',
-      health: '/health',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime()
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      status: 'ERROR', 
-      message: 'Health check failed',
-      error: error.message 
-    });
-  }
+  res.json({ 
+    status: 'OK', 
+    message: 'Festival Reports API Server',
+    health: '/health',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // Socket.io connection handling
@@ -1641,12 +1633,13 @@ io.on('connection', (socket) => {
 });
 
 // Function to emit real-time updates
-export function emitUpdate(room, event, data) {
+// Function to emit real-time updates
+function emitUpdate(room, event, data) {
   io.to(room).emit(event, data);
 }
 
 // Function to emit global updates
-export function emitGlobalUpdate(event, data) {
+function emitGlobalUpdate(event, data) {
   io.to('global').emit(event, data);
 }
 
