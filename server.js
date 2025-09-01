@@ -94,7 +94,13 @@ if (!config.zeroHero.apiKey) {
 }
 
 // Initialize database
-await initDatabase();
+try {
+  await initDatabase();
+  console.log('✅ Database initialized successfully');
+} catch (error) {
+  console.error('⚠️  Database initialization failed:', error.message);
+  console.log('🔄 Server will continue without database (some features may not work)');
+}
 
 // Enable CORS with restrictions
 app.use(cors({
@@ -1596,12 +1602,21 @@ app.get('/health', (req, res) => {
 
 // Root endpoint for Railway health checks
 app.get('/', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Festival Reports API Server',
-    health: '/health',
-    timestamp: new Date().toISOString()
-  });
+  try {
+    res.json({ 
+      status: 'OK', 
+      message: 'Festival Reports API Server',
+      health: '/health',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'ERROR', 
+      message: 'Health check failed',
+      error: error.message 
+    });
+  }
 });
 
 // Socket.io connection handling
