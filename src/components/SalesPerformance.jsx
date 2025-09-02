@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Calendar, Filter, DollarSign, Percent, Package, Tag } from 'lucide-react';
+import { TrendingUp, Calendar, Filter, DollarSign, Percent, Package, Tag, X, Eye } from 'lucide-react';
 import { apiService } from '../api';
+import { excludedSalesService } from '../services/excludedSalesService';
 
 const SalesPerformance = () => {
   const [sales, setSales] = useState([]);
@@ -20,6 +21,8 @@ const SalesPerformance = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [excludeTags, setExcludeTags] = useState([]);
   const [listingsData, setListingsData] = useState({});
+  const [excludedSales, setExcludedSales] = useState(new Set());
+  const [loadingExcluded, setLoadingExcluded] = useState(false);
 
   // Set default date range to today and tomorrow
   useEffect(() => {
@@ -47,6 +50,27 @@ const SalesPerformance = () => {
       loadListingsData();
     }
   }, [sales]);
+
+  // Load excluded sales
+  useEffect(() => {
+    loadExcludedSales();
+  }, []);
+
+  const loadExcludedSales = async () => {
+    try {
+      setLoadingExcluded(true);
+      const response = await excludedSalesService.getExcludedSales();
+      const excludedSet = new Set();
+      response.forEach(excluded => {
+        excludedSet.add(`${excluded.saleId}-${excluded.itemIndex}`);
+      });
+      setExcludedSales(excludedSet);
+    } catch (error) {
+      console.error('Error loading excluded sales:', error);
+    } finally {
+      setLoadingExcluded(false);
+    }
+  };
 
   const loadListingsData = async () => {
     try {
@@ -330,6 +354,24 @@ const SalesPerformance = () => {
     // Apply tag filters
     filtered = applyTagFilters(filtered);
     
+    // Apply excluded sales filter
+    filtered = filtered.map(sale => {
+      if (!sale.items || !Array.isArray(sale.items)) return sale;
+      
+      const filteredItems = sale.items.filter((item, itemIndex) => {
+        return !isSaleExcluded(sale.id, itemIndex);
+      });
+      
+      if (filteredItems.length === 0) {
+        return null; // This sale will be filtered out
+      }
+      
+      return {
+        ...sale,
+        items: filteredItems
+      };
+    }).filter(Boolean); // Remove null entries
+    
     return filtered;
   };
 
@@ -387,6 +429,32 @@ const SalesPerformance = () => {
         handleExcludeTagAdd();
       }
     }
+  };
+
+  const handleExcludeSale = async (saleId, itemIndex) => {
+    try {
+      await excludedSalesService.excludeSale(saleId, itemIndex);
+      setExcludedSales(prev => new Set([...prev, `${saleId}-${itemIndex}`]));
+    } catch (error) {
+      console.error('Error excluding sale:', error);
+    }
+  };
+
+  const handleIncludeSale = async (saleId, itemIndex) => {
+    try {
+      await excludedSalesService.includeSale(saleId, itemIndex);
+      setExcludedSales(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`${saleId}-${itemIndex}`);
+        return newSet;
+      });
+    } catch (error) {
+      console.error('Error including sale:', error);
+    }
+  };
+
+  const isSaleExcluded = (saleId, itemIndex) => {
+    return excludedSales.has(`${saleId}-${itemIndex}`);
   };
 
   if (loading) {
@@ -694,6 +762,9 @@ const SalesPerformance = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <SortableHeader field="profitMargin">Margin</SortableHeader>
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -762,6 +833,27 @@ const SalesPerformance = () => {
                         <span className={profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}>
                           {formatPercent(profitMargin)}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {isSaleExcluded(sale.id, itemIndex) ? (
+                          <button
+                            onClick={() => handleIncludeSale(sale.id, itemIndex)}
+                            className="inline-flex items-center px-2 py-1 border border-green-300 text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100"
+                            title="Include in metrics"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            Include
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleExcludeSale(sale.id, itemIndex)}
+                            className="inline-flex items-center px-2 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100"
+                            title="Exclude from metrics"
+                          >
+                            <X className="h-3 w-3 mr-1" />
+                            Exclude
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );

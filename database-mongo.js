@@ -742,12 +742,44 @@ export async function getStarredFestivalStrategyDates() {
   return result;
 }
 
+// Excluded Sales Schema
+const excludedSalesSchema = new mongoose.Schema({
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  sale_id: { type: String, required: true },
+  item_index: { type: Number, required: true },
+  created_at: { type: Date, default: Date.now }
+});
+
+excludedSalesSchema.index({ user_id: 1, sale_id: 1, item_index: 1 }, { unique: true });
+const ExcludedSales = mongoose.model('ExcludedSales', excludedSalesSchema);
+
 export async function setStarredFestivalStrategyDate(listingId, strategyDate) {
   return await StarredFestivalStrategyDate.findOneAndUpdate(
     { listing_id: listingId },
     { strategy_date: new Date(strategyDate) },
     { upsert: true, new: true }
   );
+}
+
+// Excluded Sales Functions
+export async function getExcludedSales(userId) {
+  return await ExcludedSales.find({ user_id: userId });
+}
+
+export async function addExcludedSale(userId, saleId, itemIndex) {
+  return await ExcludedSales.findOneAndUpdate(
+    { user_id: userId, sale_id: saleId, item_index: itemIndex },
+    { user_id: userId, sale_id: saleId, item_index: itemIndex },
+    { upsert: true, new: true }
+  );
+}
+
+export async function removeExcludedSale(userId, saleId, itemIndex) {
+  return await ExcludedSales.findOneAndDelete({
+    user_id: userId,
+    sale_id: saleId,
+    item_index: itemIndex
+  });
 }
 
 export async function removeStarredFestivalStrategyDate(listingId) {

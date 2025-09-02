@@ -74,7 +74,10 @@ import {
   removeStarredFestivalStrategyListing,
   getStarredFestivalStrategyDates,
   setStarredFestivalStrategyDate,
-  removeStarredFestivalStrategyDate
+  removeStarredFestivalStrategyDate,
+  getExcludedSales,
+  addExcludedSale,
+  removeExcludedSale
 } from './database-mongo.js';
 
 const app = express();
@@ -1597,6 +1600,48 @@ app.get('/health', (req, res) => {
       message: 'Health check failed',
       error: error.message 
     });
+  }
+});
+
+// Excluded sales API endpoints
+app.get('/api/excluded-sales', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const excludedSales = await getExcludedSales(userId);
+    res.json(excludedSales);
+  } catch (error) {
+    console.error('Error fetching excluded sales:', error);
+    res.status(500).json({ error: 'Failed to fetch excluded sales' });
+  }
+});
+
+app.post('/api/excluded-sales', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { saleId, itemIndex } = req.body;
+    
+    if (!saleId || itemIndex === undefined) {
+      return res.status(400).json({ error: 'Sale ID and item index are required' });
+    }
+    
+    await addExcludedSale(userId, saleId, itemIndex);
+    res.json({ success: true, message: 'Sale excluded from metrics' });
+  } catch (error) {
+    console.error('Error excluding sale:', error);
+    res.status(500).json({ error: 'Failed to exclude sale' });
+  }
+});
+
+app.delete('/api/excluded-sales/:saleId/:itemIndex', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { saleId, itemIndex } = req.params;
+    
+    await removeExcludedSale(userId, saleId, parseInt(itemIndex));
+    res.json({ success: true, message: 'Sale included in metrics' });
+  } catch (error) {
+    console.error('Error including sale:', error);
+    res.status(500).json({ error: 'Failed to include sale' });
   }
 });
 
