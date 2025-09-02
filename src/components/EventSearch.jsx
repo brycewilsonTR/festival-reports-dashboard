@@ -144,7 +144,7 @@ const EventSearch = ({ onSearch, loading }) => {
                 (sale.items || []).forEach(item => {
                   // Find the matching listing in inventory
                   const listing = (eventListings || []).find(listingItem => String(listingItem.id) === String(item.listingId));
-                  const listingTags = (listing?.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+                  const listingTags = (listing?.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
                   // Use manualCategories if present
                   const section = item.section;
                   const category = manualCategories && manualCategories[section] ? manualCategories[section] : (listing ? categorizeSection(listing.section) : categorizeSection(section));
@@ -206,7 +206,7 @@ const EventSearch = ({ onSearch, loading }) => {
                   (sale.items || []).forEach(item => {
                     // Find the matching listing in inventory
                     const listing = (inventory || []).find(listingItem => String(listingItem.id) === String(item.listingId));
-                    const listingTags = (listing?.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+                    const listingTags = (listing?.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
                     // Use manualCategories if present
                     const section = item.section;
                     const category = manualCategories && manualCategories[section] ? manualCategories[section] : (listing ? categorizeSection(listing.section) : categorizeSection(section));

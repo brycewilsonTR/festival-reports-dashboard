@@ -208,7 +208,7 @@ const SectionBreakdown = ({ inventory, sales }) => {
   // Calculate total inventory from original inventory data, excluding pre-sale, presale, presell
   const inventoryTotal = inventory && inventory.length > 0
     ? inventory.filter(item => {
-        const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+        const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
         return !tags.some(t => t === 'presale' || t === 'presell' || t === 'presale');
       }).reduce((sum, item) => sum + (item.availableNow || 0), 0)
     : 0;
@@ -226,7 +226,7 @@ const SectionBreakdown = ({ inventory, sales }) => {
       (sale.items || []).forEach(item => {
         // Find the matching listing in inventory
         const listing = (inventory || []).find(listingItem => String(listingItem.id) === String(item.listingId));
-        const listingTags = (listing?.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+        const listingTags = (listing?.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
         // Use manualCategories if present
         const section = item.section;
         const category = manualCategories && manualCategories[section] ? manualCategories[section] : (listing ? categorizeSection(listing.section) : categorizeSection(section));
@@ -287,7 +287,7 @@ const SectionBreakdown = ({ inventory, sales }) => {
   // --- Status Breakdown Logic ---
   // Helper to normalize tags
   function normalizeTag(tag) {
-    return tag.replace(/[-\s]/g, '').toLowerCase();
+    return tagItem.replace(/[-\s]/g, '').toLowerCase();
   }
 
   // Inventory Status Buckets
@@ -696,10 +696,10 @@ const SectionBreakdown = ({ inventory, sales }) => {
                           if (!item.availableNow || item.availableNow <= 0) return null;
                           // Exclude presale/pre-sale/presell
                           const tagsRaw = (item.tags || []);
-                          const tags = tagsRaw.map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+                          const tags = tagsRaw.map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
                           if (tags.some(t => t === 'presale' || t === 'presell')) return null;
                           // Determine status for this listing
-                          const tagsForStatus = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+                          const tagsForStatus = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
                           let status = 'Good Tickets';
                           if (tagsForStatus.includes('concern') || tagsForStatus.includes('concerned')) {
                             status = 'Concern';
@@ -757,12 +757,12 @@ const SectionBreakdown = ({ inventory, sales }) => {
                       // Sales data
                       (sales || [])
                         .flatMap(sale => {
-                          const saleTags = (sale.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+                          const saleTags = (sale.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
                           if (!Array.isArray(sale.items)) return [];
                           return sale.items.map((item, itemIdx) => {
                             // Find the matching listing in inventory
                             const listing = (inventory || []).find(listingItem => String(listingItem.id) === String(item.listingId));
-                            const listingTags = (listing?.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+                            const listingTags = (listing?.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
                             // Use tags from listing for status
                             const allTags = listingTags;
                             const itemQuantity = item.quantity || item.ticketQuantity || item.availableNow || 1;
@@ -974,7 +974,7 @@ function SalesBreakdownChart({ sales, manualCategories = {} }) {
     sale.items.forEach(item => {
       // Find the matching listing in inventory (if available)
       // We don't have inventory here, so replicate the status logic from Individual Listings
-      const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+      const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
       let status = 'Unfilled';
       if (tags.includes('concern') || tags.includes('concerned')) {
         status = 'Concern';
@@ -1040,7 +1040,7 @@ function SalesBreakdownChart({ sales, manualCategories = {} }) {
     if (!Array.isArray(sale.items)) return;
     sale.items.forEach(item => {
       // Use the same status logic as above
-      const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+      const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
       let status = 'Unfilled';
       if (tags.includes('concern') || tags.includes('concerned')) {
         status = 'Concern';
@@ -1095,7 +1095,7 @@ function SalesBreakdownChart({ sales, manualCategories = {} }) {
     }
     sale.items.forEach(item => {
       // Use the same status logic as above
-      const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+      const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
       let status = 'Unfilled';
       if (tags.includes('concern') || tags.includes('concerned')) {
         status = 'Concern';

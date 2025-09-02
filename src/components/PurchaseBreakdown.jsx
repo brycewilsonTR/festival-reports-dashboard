@@ -30,7 +30,7 @@ const PurchaseBreakdown = ({ eventId, manualCategories = {} }) => {
         if (data.resultStatus) {
           // Filter for purchases: items with "Double" tag but no "Pre-sale" tag (case insensitive)
           const purchases = data.resultData.filter(item => {
-            const tags = (item.tags || []).map(tag => tag.toLowerCase());
+            const tags = (item.tags || []).map(tagItem => tagItem.toLowerCase());
             const hasDouble = tags.includes('double');
             const hasPresale = tags.some(tag => 
               tag.includes('pre-sale') || tag.includes('presale') || tag.includes('presell')

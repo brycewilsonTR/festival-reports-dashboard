@@ -83,12 +83,12 @@ const AvailableListings = () => {
   };
 
   const handleAddTag = async (listingId, tag) => {
-    if (!tag.trim()) return;
+    if (!tagItem.trim()) return;
     try {
       // Get current tags from the listing (API tags)
       const listing = listings.find(listingItem => listingItem.id === listingId);
       const currentTags = Array.isArray(listing.tags) ? listing.tags : [];
-      const newTagsArr = [...new Set([...currentTags, tag.trim()])];
+      const newTagsArr = [...new Set([...currentTags, tagItem.trim()])];
 
       await apiService.updateListingTags(listingId, newTagsArr, false);
 
@@ -222,9 +222,9 @@ const AvailableListings = () => {
     let filtered = listings.filter(listing => {
       // Filter by exclude tags
       if (excludeTag) {
-        const excludeTags = excludeTag.split(',').map(tag => tag.trim().toUpperCase());
+        const excludeTags = excludeTag.split(',').map(tagItem => tagItem.trim().toUpperCase());
         const listingTags = tags[listing.id] || [];
-        return !listingTags.some(tag => excludeTags.includes(tag.toUpperCase()));
+        return !listingTags.some(tag => excludeTags.includes(tagItem.toUpperCase()));
       }
       return true;
     });

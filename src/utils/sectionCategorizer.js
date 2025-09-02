@@ -84,7 +84,7 @@ export const groupInventoryByType = (inventory) => {
   
   inventory.forEach(item => {
     // Normalize tags
-    const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+    const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
     // Exclude pre-sale, presale, presell
     if (tags.some(t => t === 'presale' || t === 'presell' || t === 'presale')) return;
     // Concern logic
@@ -128,7 +128,7 @@ export const groupSalesByType = (sales, manualCategories = {}) => {
   const uncategorizedSections = [];
   allItems.forEach(item => {
     // Normalize tags
-    const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+    const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
     // Exclude pre-sale, presale, presell
     if (tags.some(t => t === 'presale' || t === 'presell' || t === 'presale')) return;
     // Concern logic

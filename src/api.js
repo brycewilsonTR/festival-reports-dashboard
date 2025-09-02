@@ -249,14 +249,14 @@ export const apiService = {
 
       // Count all inventory, excluding presale/pre-sale/presell
       const inventoryCount = inventory.filter(item => {
-        const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+        const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
         return !tags.some(t => t === 'presale' || t === 'presell' || t === 'presale');
       }).reduce((total, item) => total + (item.availableNow || 0), 0);
       // Calculate total tickets sold (sum of all item quantities in all sales), excluding presale/pre-sale/presell
       const salesCount = sales.reduce((total, sale) => {
         if (!Array.isArray(sale.items)) return total;
         return total + sale.items.reduce((sum, item) => {
-          const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+          const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
           if (tags.some(t => t === 'presale' || t === 'presell' || t === 'presale')) return sum;
           return sum + (item.quantity || item.ticketQuantity || item.availableNow || 1);
         }, 0);

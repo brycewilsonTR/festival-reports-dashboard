@@ -203,7 +203,7 @@ const ListedForSaleAndSalesBreakdown = ({
 
       // Build tags
       const baseTags = ['Festival', 'pre-sale', 'TR'];
-      const additionalTags = presaleForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      const additionalTags = presaleForm.tags.split(',').map(tagItem => tagItem.trim()).filter(tag => tag);
       const allTags = [...baseTags, ...additionalTags];
 
       // Get current timestamp in ISO format
@@ -464,7 +464,7 @@ const ListedForSaleAndSalesBreakdown = ({
                   })
                   .map((item, idx) => {
                     // Determine status for this listing
-                    const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+                    const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
                     let status = 'Good Tickets';
                     if (tags.includes('presale') || tags.includes('pre-sale') || tags.includes('presell')) {
                       status = 'Presale';

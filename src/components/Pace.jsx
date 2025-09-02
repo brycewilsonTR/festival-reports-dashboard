@@ -25,7 +25,7 @@ const Pace = ({ eventId, sales, manualCategories = {} }) => {
         if (data.resultStatus) {
           // Filter for purchases: items with "Double" tag but no "Pre-sale" tag (case insensitive)
           const purchases = data.resultData.filter(item => {
-            const tags = (item.tags || []).map(tag => tag.toLowerCase());
+            const tags = (item.tags || []).map(tagItem => tagItem.toLowerCase());
             const hasDouble = tags.includes('double');
             const hasPresale = tags.some(tag =>
               tag.includes('pre-sale') || tag.includes('presale') || tag.includes('presell')
@@ -129,7 +129,7 @@ const Pace = ({ eventId, sales, manualCategories = {} }) => {
                              if (itemType === type) {
                  // Use the same sales counting logic as Sales Breakdown
                  // Count both Unfilled (presale) and Filled Pending Shipment sales
-                 const tags = (item.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
+                 const tags = (item.tags || []).map(tagItem => tagItem.replace(/[-\s]/g, '').toLowerCase());
                  let status = 'Unfilled';
                  if (tags.includes('concern') || tags.includes('concerned')) {
                    status = 'Concern';
