@@ -1,0 +1,19 @@
+# Backend files that shouldn't be deployed to Vercel
+server.js
+database.js
+database-mongo.js
+config.js
+.env
+.env.local
+.env.production
+*.db
+*.log
+
+# Development files
+node_modules
+.git
+.DS_Store
+
+# Build artifacts
+dist
+build
