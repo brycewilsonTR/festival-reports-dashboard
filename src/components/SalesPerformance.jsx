@@ -86,24 +86,24 @@ const SalesPerformance = () => {
         params: { eventIds: eventIds.join(',') } 
       });
       
-      const listings = listingsResponse.resultData || [];
+      const fetchedListingsData = listingsResponse.resultData || [];
       
       // Create a map of listing ID to tags
-      const listingsMap = {};
-      const allTags = new Set();
+      const listingsTagMap = {};
+      const allTagsSet = new Set();
       
-      listings.forEach(listing => {
-        if (listing.id && listing.tags) {
-          listingsMap[listing.id] = listing.tags;
-          listing.tags.forEach(tag => allTags.add(tag));
+      fetchedListingsData.forEach(listingRecord => {
+        if (listingRecord.id && listingRecord.tags) {
+          listingsTagMap[listingRecord.id] = listingRecord.tags;
+          listingRecord.tags.forEach(tagValue => allTagsSet.add(tagValue));
         }
       });
       
-      setListingsData(listingsMap);
-      setAvailableTags(Array.from(allTags).sort());
+      setListingsData(listingsTagMap);
+      setAvailableTags(Array.from(allTagsSet).sort());
       
-      console.log('Loaded listings data with tags:', Object.keys(listingsMap).length, 'listings');
-      console.log('Available tags:', Array.from(allTags));
+      console.log('Loaded listings data with tags:', Object.keys(listingsTagMap).length, 'listings');
+      console.log('Available tags:', Array.from(allTagsSet));
     } catch (err) {
       console.error('Error loading listings data:', err);
       // Don't set error state for listings - it's not critical for sales display
@@ -173,7 +173,7 @@ const SalesPerformance = () => {
       if (excludeTags.length > 0) {
         const hasExcludedTag = sale.items.some(item => {
           const itemTags = getItemTags(item);
-          return excludeTags.some(tag => 
+          return excludeTags.some(tagValue => 
             itemTags.some(itemTag => 
               itemTag.toLowerCase().includes(tag.toLowerCase())
             )
@@ -189,7 +189,7 @@ const SalesPerformance = () => {
       if (selectedTags.length > 0) {
         const hasIncludedTag = sale.items.some(item => {
           const itemTags = getItemTags(item);
-          return selectedTags.some(tag => 
+          return selectedTags.some(tagValue => 
             itemTags.some(itemTag => 
               itemTag.toLowerCase().includes(tag.toLowerCase())
             )
@@ -667,7 +667,7 @@ const SalesPerformance = () => {
             </div>
             
             <div className="flex flex-wrap gap-2">
-              {selectedTags.map(tag => (
+              {selectedTags.map(tagValue => (
                 <span
                   key={`active-include-${tag}`}
                   className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
@@ -682,7 +682,7 @@ const SalesPerformance = () => {
                 </span>
               ))}
               
-              {excludeTags.map(tag => (
+              {excludeTags.map(tagValue => (
                 <span
                   key={`active-exclude-${tag}`}
                   className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full"
