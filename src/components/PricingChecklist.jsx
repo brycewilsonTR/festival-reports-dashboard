@@ -584,11 +584,12 @@ const PricingChecklist = () => {
   useEffect(() => {
     const checkNewDay = async () => {
       const now = new Date();
-      const today = now.toDateString();
+      // Use ISO date string for consistent date comparison across timezones
+      const today = now.toISOString().split('T')[0]; // YYYY-MM-DD format
       const lastResetDate = localStorage.getItem('lastStrategyResetDate');
       
       console.log(`🔄 Daily reset check: today=${today}, lastReset=${lastResetDate}, isNewDay=${lastResetDate !== today}`);
-      console.log(`🔄 Date details: now=${now.toISOString()}, today.toDateString()=${today}, lastResetDate=${lastResetDate}`);
+      console.log(`🔄 Date details: now=${now.toISOString()}, today=${today}, lastResetDate=${lastResetDate}`);
       console.log(`🔄 Component ID: ${componentId}`);
       
       // Only reset strategy listings if it's a new day
@@ -668,6 +669,7 @@ const PricingChecklist = () => {
         
         console.log(`🔄 Setting localStorage lastStrategyResetDate to: ${today}`);
         localStorage.setItem('lastStrategyResetDate', today);
+        console.log(`🔄 localStorage set successfully with ISO date format: ${today}`);
         console.log(`🔄 localStorage updated successfully`);
       } else {
         console.log(`🔄 Not a new day, skipping reset. lastResetDate: ${lastResetDate}, today: ${today}`);
@@ -693,13 +695,13 @@ const PricingChecklist = () => {
     console.log('🔄 Daily reset effect mounted - checking for new day immediately');
     checkNewDay();
     
-    // Set up interval to check every minute for more reliable daily resets
+    // Set up interval to check every minute
     const interval = setInterval(() => {
       console.log('🔄 Daily reset interval check running...');
       checkNewDay();
     }, 60000);
     
-    // Check at midnight with more robust timing
+    // Check at midnight with improved reliability
     const now = new Date();
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const timeUntilMidnight = tomorrow.getTime() - now.getTime();
@@ -707,25 +709,17 @@ const PricingChecklist = () => {
     console.log(`🔄 Setting midnight timeout for daily reset in ${Math.round(timeUntilMidnight / 1000 / 60)} minutes`);
     const midnightTimeout = setTimeout(() => {
       console.log('🔄 Midnight reached - running daily reset check');
+      // Force a new date check at midnight to ensure proper reset
+      const midnightNow = new Date();
+      const midnightToday = midnightNow.toISOString().split('T')[0];
+      console.log(`🔄 Midnight check: current date=${midnightToday}`);
       checkNewDay();
-      // Set up recurring midnight checks
-      const dailyMidnightInterval = setInterval(() => {
-        console.log('🔄 Daily midnight check running...');
-        checkNewDay();
-      }, 24 * 60 * 60 * 1000);
-      
-      // Store interval reference for cleanup
-      window.dailyMidnightInterval = dailyMidnightInterval;
     }, timeUntilMidnight);
 
     return () => {
       console.log(`🔄 Daily reset effect cleanup for component ${componentId}`);
       clearInterval(interval);
       clearTimeout(midnightTimeout);
-      if (window.dailyMidnightInterval) {
-        clearInterval(window.dailyMidnightInterval);
-        delete window.dailyMidnightInterval;
-      }
     };
   }, [threeDayListings, strategyListings, lastCompleted, componentId]); // Need these dependencies for daily reset logic
 
@@ -734,7 +728,6 @@ const PricingChecklist = () => {
   // - MAPPED listings: NEVER reset automatically (permanent)
   // - STRATEGY listings: Reset at specific intervals (7, 14, 30, 60, 90, 120, 150, 180 days) after purchase date
   // - Each interval only triggers once per listing
-  // - Handles both verificationListings AND threeDayListings that are 4+ days away
   useEffect(() => {
     const checkPurchaseDateIntervals = async () => {
       const now = new Date();
@@ -743,16 +736,9 @@ const PricingChecklist = () => {
       console.log('🔍 Checking purchase date intervals for auto-reset...');
       console.log('Current processed intervals state:', processedIntervals);
       
-      // Helper function to process a listing for purchase date intervals
-      const processListingForIntervals = async (listing, isThreeDayListing = false) => {
-        const listingId = listing.id;
-        const strategyListings = isThreeDayListing ? strategyListings : verificationStrategyListings;
-        const setStrategyListings = isThreeDayListing ? setStrategyListings : setVerificationStrategyListings;
-        const removeService = isThreeDayListing ? 
-          verificationService.removeThreeDayStrategyListing : 
-          verificationService.removeVerificationStrategyListing;
-        
-        if (strategyListings.has(listingId)) {
+      // Check each verification listing for purchase date intervals
+      for (const listing of verificationListings) {
+        if (verificationStrategyListings.has(listing.id)) {
           // Extract purchase date from notePrivate or tags
           const purchaseDate = extractPurchaseDateFromNote(listing);
           
@@ -761,20 +747,36 @@ const PricingChecklist = () => {
             
             // Check if we've hit an auto-reset milestone that hasn't been processed yet
             if (autoResetDays.includes(daysSincePurchase)) {
+              const listingId = listing.id;
               const currentProcessedIntervals = processedIntervals[listingId] || [];
               
               // Only reset if this specific interval hasn't been processed yet
               if (!currentProcessedIntervals.includes(daysSincePurchase)) {
-                console.log(`Strategy auto-reset for ${isThreeDayListing ? 'threeDay' : 'verification'} listing ${listingId} (${listing.eventName || listing.event_name || listing.name || listing.title || 'Unknown Event'}) at ${daysSincePurchase} days after purchase`);
+                console.log(`Strategy auto-reset for listing ${listingId} (${listing.eventName}) at ${daysSincePurchase} days after purchase`);
                 
                 try {
                   // Remove strategy status from backend
-                  await removeService(listingId);
+                  await verificationService.removeVerificationStrategyListing(listingId);
                   
                   // Remove from local state
-                  const newStrategyListings = new Set(strategyListings);
+                  const newStrategyListings = new Set(verificationStrategyListings);
                   newStrategyListings.delete(listingId);
-                  setStrategyListings(newStrategyListings);
+                  setVerificationStrategyListings(newStrategyListings);
+                  
+                  // Clear the strategy reset date since it's no longer needed
+                  if (verificationStrategyDates[listingId]) {
+                    try {
+                      await verificationService.removeVerificationStrategyDate(listingId);
+                      setVerificationStrategyDates(prev => {
+                        const newDates = { ...prev };
+                        delete newDates[listingId];
+                        return newDates;
+                      });
+                      console.log(`Strategy reset date cleared for listing ${listingId}`);
+                    } catch (error) {
+                      console.error('Error clearing strategy reset date for listing:', listingId, error);
+                    }
+                  }
                   
                   // Mark this interval as processed for this listing
                   setProcessedIntervals(prev => ({
@@ -782,38 +784,21 @@ const PricingChecklist = () => {
                     [listingId]: [...(prev[listingId] || []), daysSincePurchase]
                   }));
                   
-                  console.log(`Strategy successfully reset for ${isThreeDayListing ? 'threeDay' : 'verification'} listing ${listingId} at ${daysSincePurchase} days interval`);
+                  console.log(`Strategy successfully reset for listing ${listingId} at ${daysSincePurchase} days interval`);
                 } catch (error) {
-                  console.error(`Error auto-resetting strategy for ${isThreeDayListing ? 'threeDay' : 'verification'} listing:`, listingId, error);
+                  console.error('Error auto-resetting strategy for listing:', listingId, error);
                 }
               } else {
-                console.log(`Interval ${daysSincePurchase} already processed for ${isThreeDayListing ? 'threeDay' : 'verification'} listing ${listingId}, skipping auto-reset`);
+                console.log(`Interval ${daysSincePurchase} already processed for listing ${listingId}, skipping auto-reset`);
+                console.log(`Processed intervals for listing ${listingId}:`, currentProcessedIntervals);
               }
             }
           }
         }
-      };
-      
-      // Check verification listings for purchase date intervals
-      for (const listing of verificationListings) {
-        await processListingForIntervals(listing, false);
-      }
-      
-      // Check threeDay listings that are 4+ days away for purchase date intervals
-      for (const listing of threeDayListings) {
-        const eventDate = new Date(listing.eventDate);
-        const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
-        
-        // Only process threeDay listings that are 4+ days away (not within 3 days)
-        if (daysUntilEvent > 3) {
-          await processListingForIntervals(listing, true);
-        }
       }
     };
 
-    // Check immediately on mount and then set up daily checks
-    checkPurchaseDateIntervals();
-    
+    // Don't check immediately - only check at midnight to avoid immediate auto-reset
     // Set up interval to check daily at midnight
     const now = new Date();
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -827,7 +812,7 @@ const PricingChecklist = () => {
     }, timeUntilMidnight);
 
     return () => clearTimeout(midnightTimeout);
-  }, [verificationListings, verificationStrategyListings, threeDayListings, strategyListings]);
+  }, [verificationListings, verificationStrategyListings]);
 
   // Save checklist state to localStorage
   useEffect(() => {
