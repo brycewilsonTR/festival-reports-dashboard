@@ -1867,7 +1867,7 @@ const PricingChecklist = () => {
             >
               {getTaskIcon('reviewListingsAtFloor')}
             </button>
-            <span className="font-medium text-gray-900">Review listings at the floor</span>
+            <span className="font-medium text-gray-900">Review Floor, Ceiling and other problem listings in Broker Nerds</span>
           </div>
           <div className="flex items-center gap-2">
             {getTaskStatus('reviewListingsAtFloor')}
