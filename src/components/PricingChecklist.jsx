@@ -11,6 +11,7 @@ const PricingChecklist = () => {
     reviewStrategy: false,
     priceNewInventory: false,
     reviewUnverified: false,
+    invoiceNoSales: false,
     reviewListingsAtFloor: false,
     lookAtStarred: false,
     reviewSalesPerformance: false
@@ -1861,6 +1862,22 @@ const PricingChecklist = () => {
             <br />• <em>Auto-reset happens once per interval at midnight. If you manually re-enable strategy, it will go through the auto-reset cycle again.</em>
             <br />• <strong>Clock button</strong> sets custom strategy reset date (resets once on that date)
             <br />• Use "Show All" to see all events regardless of status
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => handleTaskToggle('invoiceNoSales')}
+              className="hover:scale-110 transition-transform cursor-pointer p-1 rounded hover:bg-gray-100"
+              title="Click to toggle task completion"
+            >
+              {getTaskIcon('invoiceNoSales')}
+            </button>
+            <span className="font-medium text-gray-900">Invoicing out previous day No Sales</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {getTaskStatus('invoiceNoSales')}
           </div>
         </div>
 
