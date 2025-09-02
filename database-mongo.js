@@ -280,7 +280,14 @@ export async function updateLastLogin(userId) {
 }
 
 export async function getAllUsers() {
-  return await User.find({}, { password_hash: 0 });
+  const users = await User.find({}, { password_hash: 0 });
+  return users.map(user => ({
+    id: user._id,
+    email: user.email,
+    isAdmin: user.is_admin,
+    created_at: user.created_at,
+    last_login: user.last_login
+  }));
 }
 
 export async function updateUserPassword(userId, passwordHash) {
