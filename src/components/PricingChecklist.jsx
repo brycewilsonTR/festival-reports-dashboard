@@ -1257,6 +1257,69 @@ const PricingChecklist = () => {
     };
   };
 
+  const handleManualVerificationStrategyReset = async () => {
+    console.log('🔄 Manual verification strategy reset triggered');
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const autoResetDays = [7, 14, 30, 60, 90, 120, 150, 180];
+    
+    // Reset strategy status for all verification listings that should be reset
+    const eventsToReset = [];
+    
+    verificationStrategyListings.forEach(listingId => {
+      const listing = verificationListings.find(l => l.id === listingId);
+      if (listing) {
+        const purchaseDate = extractPurchaseDateFromNote(listing);
+        
+        if (purchaseDate) {
+          const daysSincePurchase = Math.ceil((now - purchaseDate) / (1000 * 60 * 60 * 24));
+          
+          // Check if this listing should be reset based on purchase date intervals
+          if (autoResetDays.includes(daysSincePurchase)) {
+            eventsToReset.push({ listingId, reason: `${daysSincePurchase} days after purchase`, listing });
+            console.log(`🔄 Manual reset: ${listing.eventName} (${daysSincePurchase} days after purchase)`);
+          }
+        }
+        
+        // Check if this listing has a custom strategy reset date that is today
+        if (verificationStrategyDates[listingId] === today) {
+          eventsToReset.push({ listingId, reason: 'custom reset date reached', listing });
+          console.log(`🔄 Manual reset: ${listing.eventName} (custom reset date: ${verificationStrategyDates[listingId]})`);
+        }
+      }
+    });
+    
+    // Remove strategy status from backend for events that should be reset
+    for (const { listingId, reason, listing } of eventsToReset) {
+      try {
+        await verificationService.removeVerificationStrategyListing(listingId);
+        console.log(`✅ Manual reset: Removed strategy for ${listing.eventName} (${reason})`);
+      } catch (error) {
+        console.error('❌ Manual reset error:', listingId, error);
+      }
+    }
+    
+    // Update local state - remove reset listings from strategy set
+    const newVerificationStrategyListings = new Set(verificationStrategyListings);
+    eventsToReset.forEach(({ listingId }) => {
+      newVerificationStrategyListings.delete(listingId);
+    });
+    setVerificationStrategyListings(newVerificationStrategyListings);
+    
+    // Clear custom strategy reset dates for listings that were reset
+    const newVerificationStrategyDates = { ...verificationStrategyDates };
+    eventsToReset.forEach(({ listingId }) => {
+      if (newVerificationStrategyDates[listingId]) {
+        delete newVerificationStrategyDates[listingId];
+        // Also remove from backend
+        verificationService.removeVerificationStrategyDate(listingId).catch(console.error);
+      }
+    });
+    setVerificationStrategyDates(newVerificationStrategyDates);
+    
+    console.log(`🔄 Manual verification reset complete: ${eventsToReset.length} events reset`);
+  };
+
   const handleManualStrategyReset = async () => {
     console.log('🔄 Manual strategy reset triggered');
     const now = new Date();
@@ -1781,6 +1844,13 @@ const PricingChecklist = () => {
               }`}
             >
               {verificationShowAll ? 'Show Unprocessed' : 'Show All'}
+            </button>
+            <button
+              onClick={handleManualVerificationStrategyReset}
+              className="ml-2 px-3 py-1 text-xs bg-red-100 text-red-700 rounded-full border border-red-300 hover:bg-red-200"
+              title="Force reset strategy status for events at purchase date intervals or custom reset dates"
+            >
+              Reset Strategy
             </button>
           </h4>
           
