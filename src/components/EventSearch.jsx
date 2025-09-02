@@ -143,7 +143,7 @@ const EventSearch = ({ onSearch, loading }) => {
               (eventSales || []).forEach(sale => {
                 (sale.items || []).forEach(item => {
                   // Find the matching listing in inventory
-                  const listing = (eventListings || []).find(l => String(l.id) === String(item.listingId));
+                  const listing = (eventListings || []).find(listingItem => String(listingItem.id) === String(item.listingId));
                   const listingTags = (listing?.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
                   // Use manualCategories if present
                   const section = item.section;
@@ -205,7 +205,7 @@ const EventSearch = ({ onSearch, loading }) => {
                 (sales || []).forEach(sale => {
                   (sale.items || []).forEach(item => {
                     // Find the matching listing in inventory
-                    const listing = (inventory || []).find(l => String(l.id) === String(item.listingId));
+                    const listing = (inventory || []).find(listingItem => String(listingItem.id) === String(item.listingId));
                     const listingTags = (listing?.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
                     // Use manualCategories if present
                     const section = item.section;

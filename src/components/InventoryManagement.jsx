@@ -29,7 +29,7 @@ const InventoryManagement = () => {
         
         if (unverificationDate <= today) {
           // Auto-unverify this listing
-          const listing = listings.find(l => l.id === listingId);
+          const listing = listings.find(listingItem => listingItem.id === listingId);
           if (listing) {
             handleUnverification(listing);
             // Remove the expired unverification date

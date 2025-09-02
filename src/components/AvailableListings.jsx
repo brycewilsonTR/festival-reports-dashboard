@@ -86,7 +86,7 @@ const AvailableListings = () => {
     if (!tag.trim()) return;
     try {
       // Get current tags from the listing (API tags)
-      const listing = listings.find(l => l.id === listingId);
+      const listing = listings.find(listingItem => listingItem.id === listingId);
       const currentTags = Array.isArray(listing.tags) ? listing.tags : [];
       const newTagsArr = [...new Set([...currentTags, tag.trim()])];
 
@@ -95,7 +95,7 @@ const AvailableListings = () => {
       // Update local state to reflect the new tag
       setListings(listings =>
         listings.map(l =>
-          l.id === listingId ? { ...l, tags: newTagsArr } : l
+          listingItem.id === listingId ? { ...l, tags: newTagsArr } : l
         )
       );
       setNewTags(prev => ({ ...prev, [listingId]: '' }));
@@ -128,7 +128,7 @@ const AvailableListings = () => {
       for (const listingId of selectedListings) {
         try {
           // Get current tags from the listing (API tags)
-          const listing = listings.find(l => l.id === listingId);
+          const listing = listings.find(listingItem => listingItem.id === listingId);
           const currentTags = Array.isArray(listing.tags) ? listing.tags : [];
           const newTagsArr = [...new Set([...currentTags, bulkTag.trim()])];
 
@@ -138,7 +138,7 @@ const AvailableListings = () => {
           // Update local state to reflect the new tag
           setListings(listings =>
             listings.map(l =>
-              l.id === listingId ? { ...l, tags: newTagsArr } : l
+              listingItem.id === listingId ? { ...l, tags: newTagsArr } : l
             )
           );
         } catch (err) {

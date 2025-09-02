@@ -606,7 +606,7 @@ const PricingChecklist = () => {
         
         const newStrategyListings = new Set();
         strategyListings.forEach(listingId => {
-          const listing = threeDayListings.find(l => l.id === listingId);
+          const listing = threeDayListings.find(listingItem => listingItem.id === listingId);
           if (listing) {
             const eventDate = new Date(listing.eventDate);
             const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
@@ -1267,7 +1267,7 @@ const PricingChecklist = () => {
     const eventsToReset = [];
     
     verificationStrategyListings.forEach(listingId => {
-      const listing = verificationListings.find(l => l.id === listingId);
+      const listing = verificationListings.find(listingItem => listingItem.id === listingId);
       if (listing) {
         const purchaseDate = extractPurchaseDateFromNote(listing);
         
@@ -1327,7 +1327,7 @@ const PricingChecklist = () => {
     // Reset strategy status for all events within 3 days
     const eventsToReset = [];
     strategyListings.forEach(listingId => {
-      const listing = threeDayListings.find(l => l.id === listingId);
+      const listing = threeDayListings.find(listingItem => listingItem.id === listingId);
       if (listing) {
         const eventDate = new Date(listing.eventDate);
         const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
@@ -1352,7 +1352,7 @@ const PricingChecklist = () => {
     // Update local state
     const newStrategyListings = new Set();
     strategyListings.forEach(listingId => {
-      const listing = threeDayListings.find(l => l.id === listingId);
+      const listing = threeDayListings.find(listingItem => listingItem.id === listingId);
       if (listing) {
         const eventDate = new Date(listing.eventDate);
         const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));

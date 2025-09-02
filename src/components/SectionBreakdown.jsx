@@ -225,7 +225,7 @@ const SectionBreakdown = ({ inventory, sales }) => {
     (sales || []).forEach(sale => {
       (sale.items || []).forEach(item => {
         // Find the matching listing in inventory
-        const listing = (inventory || []).find(l => String(l.id) === String(item.listingId));
+        const listing = (inventory || []).find(listingItem => String(listingItem.id) === String(item.listingId));
         const listingTags = (listing?.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
         // Use manualCategories if present
         const section = item.section;
@@ -334,7 +334,7 @@ const SectionBreakdown = ({ inventory, sales }) => {
   (sales || []).forEach(sale => {
     (sale.items || []).forEach(item => {
       // Find the matching listing in inventory
-      const listing = (inventory || []).find(l => String(l.id) === String(item.listingId));
+      const listing = (inventory || []).find(listingItem => String(listingItem.id) === String(item.listingId));
       const listingTags = (listing?.tags || []).map(normalizeTag);
       const itemQuantity = item.quantity || item.ticketQuantity || item.availableNow || 1;
       // Concern: if concern at listing level
@@ -761,7 +761,7 @@ const SectionBreakdown = ({ inventory, sales }) => {
                           if (!Array.isArray(sale.items)) return [];
                           return sale.items.map((item, itemIdx) => {
                             // Find the matching listing in inventory
-                            const listing = (inventory || []).find(l => String(l.id) === String(item.listingId));
+                            const listing = (inventory || []).find(listingItem => String(listingItem.id) === String(item.listingId));
                             const listingTags = (listing?.tags || []).map(tag => tag.replace(/[-\s]/g, '').toLowerCase());
                             // Use tags from listing for status
                             const allTags = listingTags;
