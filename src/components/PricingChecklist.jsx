@@ -1874,7 +1874,7 @@ const PricingChecklist = () => {
             >
               {getTaskIcon('invoiceNoSales')}
             </button>
-            <span className="font-medium text-gray-900">Invoicing out previous day No Sales</span>
+            <span className="font-medium text-gray-900">Invoice out previous day no sales</span>
           </div>
           <div className="flex items-center gap-2">
             {getTaskStatus('invoiceNoSales')}
