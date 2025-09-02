@@ -611,10 +611,17 @@ const PricingChecklist = () => {
             const eventDate = new Date(listing.eventDate);
             const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
             
+            // Enhanced debugging for strategy reset logic
+            console.log(`🔄 Strategy reset analysis for ${listing.eventName}:`);
+            console.log(`   - Event Date: ${listing.eventDate}`);
+            console.log(`   - Current Time: ${now.toISOString()}`);
+            console.log(`   - Days Until Event: ${daysUntilEvent}`);
+            console.log(`   - Should Reset: ${daysUntilEvent <= 3}`);
+            
             // Keep strategy status for events more than 3 days away (4+ days)
             if (daysUntilEvent > 3) {
               newStrategyListings.add(listingId);
-              console.log(`🔄 Keeping strategy for listing ${listingId} (${daysUntilEvent} days away)`);
+              console.log(`🔄 Keeping strategy for listing ${listingId} (${daysUntilEvent} days away - more than 3 days)`);
             } else {
               // Events within 3 days (0-3 days) will have strategy status reset daily
               console.log(`🔄 Resetting strategy for listing ${listingId} (${daysUntilEvent} days away - within 3 days)`);
@@ -1250,6 +1257,54 @@ const PricingChecklist = () => {
     };
   };
 
+  const handleManualStrategyReset = async () => {
+    console.log('🔄 Manual strategy reset triggered');
+    const now = new Date();
+    
+    // Reset strategy status for all events within 3 days
+    const eventsToReset = [];
+    strategyListings.forEach(listingId => {
+      const listing = threeDayListings.find(l => l.id === listingId);
+      if (listing) {
+        const eventDate = new Date(listing.eventDate);
+        const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilEvent <= 3) {
+          eventsToReset.push(listingId);
+          console.log(`🔄 Manual reset: ${listing.eventName} (${daysUntilEvent} days away)`);
+        }
+      }
+    });
+    
+    // Remove strategy status from backend for events within 3 days
+    for (const listingId of eventsToReset) {
+      try {
+        await verificationService.removeThreeDayStrategyListing(listingId);
+        console.log(`✅ Manual reset: Removed strategy for listing ${listingId}`);
+      } catch (error) {
+        console.error('❌ Manual reset error:', listingId, error);
+      }
+    }
+    
+    // Update local state
+    const newStrategyListings = new Set();
+    strategyListings.forEach(listingId => {
+      const listing = threeDayListings.find(l => l.id === listingId);
+      if (listing) {
+        const eventDate = new Date(listing.eventDate);
+        const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+        
+        // Keep strategy status for events more than 3 days away
+        if (daysUntilEvent > 3) {
+          newStrategyListings.add(listingId);
+        }
+      }
+    });
+    
+    setStrategyListings(newStrategyListings);
+    console.log(`🔄 Manual reset complete: ${eventsToReset.length} events reset`);
+  };
+
   const handleTaskToggle = (task) => {
     console.log('🔄 handleTaskToggle called with task:', task);
     console.log('🔄 Current checklist state:', checklist);
@@ -1531,6 +1586,13 @@ const PricingChecklist = () => {
                 ({threeDayListings.filter(listing => !(mappedListings.has(listing.id) || strategyListings.has(listing.id))).length} left)
               </span>
             )}
+            <button
+              onClick={handleManualStrategyReset}
+              className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+              title="Force reset strategy status for events within 3 days"
+            >
+              Reset Strategy
+            </button>
           </div>
         </div>
 
