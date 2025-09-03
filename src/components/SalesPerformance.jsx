@@ -480,7 +480,7 @@ const SalesPerformance = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 -mx-4 px-4">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -717,8 +717,6 @@ const SalesPerformance = () => {
         </div>
       </div>
 
-      {/* DEBUGGING: This should force vertical layout */}
-      <div className="w-full h-4 bg-red-500 mb-4" style={{display: "block", width: "100%"}}></div>      {/* Sales Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
