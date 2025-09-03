@@ -729,7 +729,7 @@ const PricingChecklist = () => {
       clearInterval(interval);
       clearTimeout(midnightTimeout);
     };
-  }, [threeDayListings, strategyListings, lastCompleted, componentId]); // Need these dependencies for daily reset logic
+  }, [threeDayListings, strategyListings, componentId]); // Need these dependencies for daily reset logic
 
   // Check purchase date intervals for 4+ days events strategy reset
   // BEHAVIOR:
