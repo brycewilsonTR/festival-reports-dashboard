@@ -220,10 +220,10 @@ const SalesPerformance = () => {
     // Try to match by section/row if no direct listing ID
     if (item.section && item.row) {
       // Find matching listing by section and row
-      for (const [listingId, tags] of Object.entries(listingsData)) {
+      for (const [listingId, listingTags] of Object.entries(listingsData)) {
         // This is a simplified matching - you might want to improve this logic
-        if (tags && Array.isArray(tags)) {
-          return tags;
+        if (listingTags && Array.isArray(listingTags)) {
+          return listingTags;
         }
       }
     }
@@ -669,7 +669,7 @@ const SalesPerformance = () => {
             <div className="flex flex-wrap gap-2">
               {selectedTags.map(tagValue => (
                 <span
-                  key={`active-include-${tagValue}`}
+                  key={`active-include-${tag}`}
                   className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
                 >
                   +{tagValue}
@@ -684,7 +684,7 @@ const SalesPerformance = () => {
               
               {excludeTags.map(tagValue => (
                 <span
-                  key={`active-exclude-${tagValue}`}
+                  key={`active-exclude-${tag}`}
                   className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full"
                 >
                   -{tagValue}
@@ -873,4 +873,4 @@ const SalesPerformance = () => {
   );
 };
 
-export default SalesPerformance; // Force redeploy - Wed Sep  3 10:56:42 EDT 2025
+export default SalesPerformance; 
