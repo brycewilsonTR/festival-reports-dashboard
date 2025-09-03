@@ -1489,8 +1489,13 @@ const PricingChecklist = () => {
     
     const lastDate = new Date(lastCompleted[task]);
     const today = new Date();
-    const diffTime = Math.abs(today - lastDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Set both dates to start of day for accurate comparison
+    const lastDateStart = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    const diffTime = todayStart - lastDateStart;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
     return diffDays;
   };
