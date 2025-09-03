@@ -539,6 +539,8 @@ const SalesPerformance = () => {
           
         </div>
 
+      </div>
+
       {/* Date Filters */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center gap-4">
@@ -868,7 +870,7 @@ const SalesPerformance = () => {
           </div>
         )}
       </div>
-      </div>    </div>
+      </div>
   );
 };// Force deployment - Wed Sep  3 11:49:36 EDT 2025
 
