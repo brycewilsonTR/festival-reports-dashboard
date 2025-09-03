@@ -224,7 +224,7 @@ const AvailableListings = () => {
       if (excludeTag) {
         const excludeTags = excludeTag.split(',').map(tagItem => tagItem.trim().toUpperCase());
         const listingTags = tags[listing.id] || [];
-        return !listingTags.some(tag => excludeTags.includes(tagItem.toUpperCase()));
+        return !listingTags.some(tag => excludeTags.includes(tag.toUpperCase()));
       }
       return true;
     });
