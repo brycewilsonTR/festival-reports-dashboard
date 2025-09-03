@@ -23,6 +23,8 @@ const SalesPerformance = () => {
   const [listingsData, setListingsData] = useState({});
   const [excludedSales, setExcludedSales] = useState(new Set());
   const [loadingExcluded, setLoadingExcluded] = useState(false);
+  const [lookAtStarredFestivals, setLookAtStarredFestivals] = useState(false);
+  const [invoiceOutPreviousDayNoSales, setInvoiceOutPreviousDayNoSales] = useState(false);
 
   // Set default date range to today and tomorrow
   useEffect(() => {
@@ -30,8 +32,6 @@ const SalesPerformance = () => {
     const todayStr = today.toISOString().split('T')[0];
     
     const tomorrow = new Date();
-  const [lookAtStarredFestivals, setLookAtStarredFestivals] = useState(false);
-  const [invoiceOutPreviousDayNoSales, setInvoiceOutPreviousDayNoSales] = useState(false);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
     
