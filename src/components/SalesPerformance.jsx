@@ -23,8 +23,6 @@ const SalesPerformance = () => {
   const [listingsData, setListingsData] = useState({});
   const [excludedSales, setExcludedSales] = useState(new Set());
   const [loadingExcluded, setLoadingExcluded] = useState(false);
-  const [lookAtStarredFestivals, setLookAtStarredFestivals] = useState(false);
-  const [invoiceOutPreviousDayNoSales, setInvoiceOutPreviousDayNoSales] = useState(false);
 
   // Set default date range to today and tomorrow
   useEffect(() => {
@@ -539,26 +537,7 @@ const SalesPerformance = () => {
             </div>
           </div>
           
-          <label className="flex items-center space-x-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={invoiceOutPreviousDayNoSales}
-              onChange={(e) => setInvoiceOutPreviousDayNoSales(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <span className="text-sm text-gray-700">Invoice out previous day no sales</span>
-          </label>
-          
-          <label className="flex items-center space-x-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={lookAtStarredFestivals}
-              onChange={(e) => setLookAtStarredFestivals(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <span className="text-sm text-gray-700">Look at starred festivals</span>
-          </label>        </div>
-      </div>
+        </div>
 
       {/* Date Filters */}
       <div className="bg-white rounded-lg shadow p-6">
@@ -891,7 +870,7 @@ const SalesPerformance = () => {
         )}
       </div>
     </div>
-  );
+    </div>  );
 };
 
 export default SalesPerformance; // Force fresh deployment - Wed Sep  3 11:22:48 EDT 2025
