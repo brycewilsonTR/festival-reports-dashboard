@@ -287,7 +287,7 @@ const SectionBreakdown = ({ inventory, sales }) => {
   // --- Status Breakdown Logic ---
   // Helper to normalize tags
   function normalizeTag(tag) {
-    return tagItem.replace(/[-\s]/g, '').toLowerCase();
+    return tag.replace(/[-\s]/g, '').toLowerCase();
   }
 
   // Inventory Status Buckets
