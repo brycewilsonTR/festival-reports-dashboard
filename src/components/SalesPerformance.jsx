@@ -717,7 +717,7 @@ const SalesPerformance = () => {
         </div>
       </div>
 
-      {/* Sales Table */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">      {/* Sales Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -870,9 +870,9 @@ const SalesPerformance = () => {
         )}
       </div>
     </div>
-    </div>  );
-};
+      </div>
+    </div>
+  );
+};// Force deployment - Wed Sep  3 11:49:36 EDT 2025
 
-export default SalesPerformance; // Force fresh deployment - Wed Sep  3 11:22:48 EDT 2025
-// Force deployment - Wed Sep  3 11:49:36 EDT 2025
-// Force deployment - Wed Sep  3 11:53:21 EDT 2025
+export default SalesPerformance;// Force deployment - Wed Sep  3 11:53:21 EDT 2025
