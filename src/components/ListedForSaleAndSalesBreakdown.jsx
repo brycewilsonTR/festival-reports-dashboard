@@ -255,7 +255,7 @@ const ListedForSaleAndSalesBreakdown = ({
       const listingData = {
         listings: [{
           eventId: parseInt(templateData.eventId),
-          vendorId: parseInt(templateData.vendorId || 1),
+          vendorId: parseInt(templateData.vendorId) || 1,
           eventStubHubId: templateData.eventStubHubId ? parseInt(templateData.eventStubHubId) : 1,
           eventTicketmasterId: templateData.eventTicketmasterId ? parseInt(templateData.eventTicketmasterId) : 1,
           performerId: templateData.performerId ? parseInt(templateData.performerId) : 1,
