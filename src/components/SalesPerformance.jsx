@@ -350,6 +350,9 @@ const SalesPerformance = () => {
   );
 
   // Apply all filters and get final sales data
+  const isSaleExcluded = (saleId, itemIndex) => {
+    return excludedSales.has(`${saleId}-${itemIndex}`);
+  };
   const getFinalFilteredSales = () => {
     let filtered = filteredSales;
     
@@ -455,9 +458,6 @@ const SalesPerformance = () => {
     }
   };
 
-  const isSaleExcluded = (saleId, itemIndex) => {
-    return excludedSales.has(`${saleId}-${itemIndex}`);
-  };
 
   if (loading) {
     return (
