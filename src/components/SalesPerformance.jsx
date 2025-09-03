@@ -175,7 +175,7 @@ const SalesPerformance = () => {
           const itemTags = getItemTags(item);
           return excludeTags.some(tagValue => 
             itemTags.some(itemTag => 
-              itemTag.toLowerCase().includes(tag.toLowerCase())
+              itemTag.toLowerCase().includes(tagValue.toLowerCase())
             )
           );
         });
@@ -191,7 +191,7 @@ const SalesPerformance = () => {
           const itemTags = getItemTags(item);
           return selectedTags.some(tagValue => 
             itemTags.some(itemTag => 
-              itemTag.toLowerCase().includes(tag.toLowerCase())
+              itemTag.toLowerCase().includes(tagValue.toLowerCase())
             )
           );
         });
@@ -669,12 +669,12 @@ const SalesPerformance = () => {
             <div className="flex flex-wrap gap-2">
               {selectedTags.map(tagValue => (
                 <span
-                  key={`active-include-${tag}`}
+                  key={`active-include-${tagValue}`}
                   className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
                 >
-                  +{tag}
+                  +{tagValue}
                   <button
-                    onClick={() => handleTagRemove(tag, true)}
+                    onClick={() => handleTagRemove(tagValue, true)}
                     className="text-blue-600 hover:text-blue-800"
                   >
                     ×
@@ -684,12 +684,12 @@ const SalesPerformance = () => {
               
               {excludeTags.map(tagValue => (
                 <span
-                  key={`active-exclude-${tag}`}
+                  key={`active-exclude-${tagValue}`}
                   className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full"
                 >
-                  -{tag}
+                  -{tagValue}
                   <button
-                    onClick={() => handleTagRemove(tag, false)}
+                    onClick={() => handleTagRemove(tagValue, false)}
                     className="text-red-600 hover:text-red-800"
                   >
                     ×
