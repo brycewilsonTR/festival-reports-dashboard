@@ -23,12 +23,6 @@ const SalesPerformance = () => {
   const [listingsData, setListingsData] = useState({});
   const [excludedSales, setExcludedSales] = useState(new Set());
   const [loadingExcluded, setLoadingExcluded] = useState(false);
-  
-  // Daily review checkboxes state
-  const [reviewStrategyEvents, setReviewStrategyEvents] = useState(false);
-  const [reviewUnverifiedListings, setReviewUnverifiedListings] = useState(false);
-  const [reviewFloorCeilingListings, setReviewFloorCeilingListings] = useState(false);
-  const [reviewPreviousSales, setReviewPreviousSales] = useState(false);
 
   // Set default date range to today and tomorrow
   useEffect(() => {
@@ -36,6 +30,8 @@ const SalesPerformance = () => {
     const todayStr = today.toISOString().split('T')[0];
     
     const tomorrow = new Date();
+  const [lookAtStarredFestivals, setLookAtStarredFestivals] = useState(false);
+  const [invoiceOutPreviousDayNoSales, setInvoiceOutPreviousDayNoSales] = useState(false);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
     
@@ -352,9 +348,6 @@ const SalesPerformance = () => {
       </span>
     </button>
   );
-  const isSaleExcluded = (saleId, itemIndex) => {
-    return excludedSales.has(`${saleId}-${itemIndex}`);
-  };
 
   // Apply all filters and get final sales data
   const getFinalFilteredSales = () => {
@@ -462,6 +455,9 @@ const SalesPerformance = () => {
     }
   };
 
+  const isSaleExcluded = (saleId, itemIndex) => {
+    return excludedSales.has(`${saleId}-${itemIndex}`);
+  };
 
   if (loading) {
     return (
@@ -495,52 +491,6 @@ const SalesPerformance = () => {
             {sortedSales.length} sales orders • {formatCurrency(totalRevenue)} total revenue
           </p>
         </div>
-      
-      {/* Daily Review Checklist */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-blue-900 mb-3">Daily Review Checklist (Complete Twice Daily)</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <label className="flex items-center space-x-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={reviewStrategyEvents}
-              onChange={(e) => setReviewStrategyEvents(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <span className="text-sm text-gray-700">Review strategy for events within 3 days</span>
-          </label>
-          
-          <label className="flex items-center space-x-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={reviewUnverifiedListings}
-              onChange={(e) => setReviewUnverifiedListings(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <span className="text-sm text-gray-700">Review any unverified listings for strategy and mapping</span>
-          </label>
-          
-          <label className="flex items-center space-x-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={reviewFloorCeilingListings}
-              onChange={(e) => setReviewFloorCeilingListings(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <span className="text-sm text-gray-700">Review Floor, Ceiling and other problem listings in Broker Nerds</span>
-          </label>
-          
-          <label className="flex items-center space-x-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={reviewPreviousSales}
-              onChange={(e) => setReviewPreviousSales(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <span className="text-sm text-gray-700">Review previous days sales performance</span>
-          </label>
-        </div>
-      </div>
       </div>
 
       {/* Summary Cards */}
@@ -588,7 +538,26 @@ const SalesPerformance = () => {
               </p>
             </div>
           </div>
-        </div>
+          
+          <label className="flex items-center space-x-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={invoiceOutPreviousDayNoSales}
+              onChange={(e) => setInvoiceOutPreviousDayNoSales(e.target.checked)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            <span className="text-sm text-gray-700">Invoice out previous day no sales</span>
+          </label>
+          
+          <label className="flex items-center space-x-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={lookAtStarredFestivals}
+              onChange={(e) => setLookAtStarredFestivals(e.target.checked)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            <span className="text-sm text-gray-700">Look at starred festivals</span>
+          </label>        </div>
       </div>
 
       {/* Date Filters */}
@@ -925,4 +894,4 @@ const SalesPerformance = () => {
   );
 };
 
-export default SalesPerformance; // Force fresh deployment - Wed Sep  3 11:06:01 EDT 2025
+export default SalesPerformance; 
